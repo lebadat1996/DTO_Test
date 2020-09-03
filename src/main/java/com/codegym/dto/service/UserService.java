@@ -38,4 +38,14 @@ public class UserService implements IUserService {
     public void delete(Long id) {
         userRepository.deleteById(id);
     }
+
+    @Override
+    public boolean isDeleted(Long id) throws Exception {
+        Optional<User> user = userRepository.findById(id);
+        if (user.get().getStatus() == 0) {
+            return true;
+        }else {
+            throw new Exception();
+        }
+    }
 }

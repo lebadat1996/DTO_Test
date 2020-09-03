@@ -3,6 +3,7 @@ package com.codegym.dto.dto;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.web.multipart.MultipartFile;
 
 @Data
 @Getter
@@ -12,10 +13,29 @@ public class UserDto {
     private String fullName;
     private String password;
     private String email;
+    private String avatar;
+
+
+    MultipartFile images;
+
+    public MultipartFile getImages() {
+        return images;
+    }
+
+    public void setImages(MultipartFile images) {
+        this.images = images;
+    }
+
+    public String getAvatar() {
+        return avatar;
+    }
+
+    public void setAvatar(String avatar) {
+        this.avatar = avatar;
+    }
 
     public UserDto() {
     }
-
 
 
     public String getUserName() {
