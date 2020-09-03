@@ -44,8 +44,8 @@ public class UserService implements IUserService {
         Optional<User> user = userRepository.findById(id);
         if (user.get().getStatus() == 0) {
             return true;
-        }else {
-            throw new Exception();
+        } else {
+            return false;
         }
     }
 }

@@ -3,6 +3,7 @@ package com.codegym.dto.controller;
 import com.codegym.dto.UserMapper;
 import com.codegym.dto.dto.UserDto;
 import com.codegym.dto.entity.User;
+import com.codegym.dto.service.IUploadService;
 import com.codegym.dto.service.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
@@ -11,7 +12,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.util.FileCopyUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.multipart.support.MultipartFilter;
 
 import java.io.File;
 import java.io.IOException;
@@ -31,8 +31,9 @@ public class UserApiResController {
         this.userService = userService;
     }
 
+
     @Autowired
-    private Environment env;
+    private IUploadService uploadService;
 
     @GetMapping
     public ResponseEntity<List<UserDto>> getAllUser() {
@@ -40,20 +41,14 @@ public class UserApiResController {
         return new ResponseEntity<>(users, HttpStatus.OK);
     }
 
-    @PostMapping
-    public ResponseEntity<User> createUser(@ModelAttribute User user) throws Exception {
-        User user1 = new User(user.getUserName(), user.getFullName(), user.getEmail(), null);
-        MultipartFile multipartFile = user.getImages();
-        String fileName = multipartFile.getOriginalFilename();
-        String fileUpLoad = env.getProperty("file_upload").toString();
-        try {
-            FileCopyUtils.copy(user.getImages().getBytes(), new File(fileUpLoad + fileName));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        user1.setAvatar(fileName);
-        User user2 = userService.create(user1);
-        return new ResponseEntity<>(user2, HttpStatus.OK);
+    @PostMapping()
+    public ResponseEntity<UserDto> createUser(@RequestBody UserDto userDto) throws Exception {
+        User user = userMapper.toUser(userDto);
+//        User entity = new User(user.getUserName(), user.getFullName(), user.getEmail(), null);
+        String fileName = uploadService.uploadFile(user.getAvatar());
+        user.setAvatar(fileName);
+        User userEntity = userService.create(user);
+        return new ResponseEntity<>(userMapper.toUserDto(userEntity), HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
@@ -67,13 +62,16 @@ public class UserApiResController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<UserDto> updateUser(@PathVariable Long id, @RequestBody UserDto userDto) throws Exception {
+    public ResponseEntity<UserDto> updateUser(@PathVariable Long id, @ModelAttribute UserDto userDto) throws Exception {
         User user = userMapper.toUser(userDto);
         user.setId(id);
         user.setCreatedAt(userService.get(user.getId()).get().getCreatedAt());
         if (!userService.isDeleted(id)) {
-            userService.update(user);
-            return new ResponseEntity<>(userDto, HttpStatus.OK);
+            User entity = userService.get(id).get();
+            String fileName = uploadService.uploadFile(user.getImages());
+            entity.setAvatar(fileName);
+            User userEntity = userService.update(entity);
+            return new ResponseEntity<>(userMapper.toUserDto(userEntity), HttpStatus.OK);
         }
         return new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
 
