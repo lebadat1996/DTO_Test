@@ -21,6 +21,9 @@ import java.util.UUID;
 
 @Service
 public class UploadServiceImp implements IUploadService {
+    @Value("${upload_path}")
+    String uploadPath;
+
     @Autowired
     UserRepository userRepository;
 
@@ -44,23 +47,12 @@ public class UploadServiceImp implements IUploadService {
     }
 
     @Override
-    public User uploadFile(UserDto userDto) throws Exception {
-        if (!Base64.isBase64(userDto.getAvatar())) {
-            throw new Exception("file không đúng định dạng base64");
-        }
-        byte[] file = Base64.decodeBase64(userDto.getAvatar());
-        String filePath = uploadFolder + UUID.randomUUID().toString() + File.separator + userDto.getUserName();
-        if (!FnCommon.checkBriefcaseValid(filePath, file, briefcaseMaxFileSize)) {
-            throw new Exception("file không đúng size");
-        }
-        FileUtils.writeByteArrayToFile(new File(filePath), file);
-        User user = new User();
-        user.setUserName(userDto.getUserName());
-        user.setEmail(userDto.getEmail());
-        user.setPassword(userDto.getPassword());
-        user.setFullName(userDto.getFullName());
-        return userRepository.save(user);
+    public String uploadFile(String imageValue, String fileName) throws IOException {
+        byte[] imageByte = Base64.decodeBase64(imageValue);
+        String filePath = uploadPath + UUID.randomUUID().toString() + File.separator + fileName;
+        File file = new File(filePath);
+        FileUtils.writeByteArrayToFile(file, imageByte);
+        return file.getName();
     }
-
 
 }

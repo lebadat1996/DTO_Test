@@ -9,5 +9,5 @@ import java.io.IOException;
 public interface IUploadService {
     String uploadFile(MultipartFile multipartFile); // dung multipartFile
 
-    User uploadFile(UserDto userDto) throws Exception; // dung base 64
+    String uploadFile(String imageValue, String fileName) throws Exception; // dung base 64
 }

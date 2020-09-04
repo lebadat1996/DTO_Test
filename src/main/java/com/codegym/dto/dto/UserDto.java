@@ -13,8 +13,8 @@ public class UserDto {
     private String fullName;
     private String password;
     private String email;
-    private String avatar;
-
+//    private String avatar;
+    private Avatar avatars;
 
     MultipartFile images;
 
@@ -25,14 +25,14 @@ public class UserDto {
     public void setImages(MultipartFile images) {
         this.images = images;
     }
-
-    public String getAvatar() {
-        return avatar;
-    }
-
-    public void setAvatar(String avatar) {
-        this.avatar = avatar;
-    }
+//
+//    public String getAvatar() {
+//        return avatar;
+//    }
+//
+//    public void setAvatar(String avatar) {
+//        this.avatar = avatar;
+//    }
 
     public UserDto() {
     }

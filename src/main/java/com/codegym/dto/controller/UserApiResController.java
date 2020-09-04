@@ -43,8 +43,13 @@ public class UserApiResController {
 
     @PostMapping()
     public ResponseEntity<UserDto> createUser(@RequestBody UserDto userDto) throws Exception {
-        User user = uploadService.uploadFile(userDto);
-        return new ResponseEntity<>(userMapper.toUserDto(user), HttpStatus.OK);
+        User user = userMapper.toUser(userDto);
+//        User entity = new User(user.getUserName(), user.getFullName(), user.getEmail(), null);
+        String fileName = userDto.getAvatars().getFileName();
+        String filePath = uploadService.uploadFile(userDto.getAvatars().getFileBase64(), fileName);
+        user.setAvatar(filePath);
+        User userEntity = userService.create(user);
+        return new ResponseEntity<>(userMapper.toUserDto(userEntity), HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
